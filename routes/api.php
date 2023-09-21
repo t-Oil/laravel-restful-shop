@@ -121,3 +121,24 @@ Route::group(
         );
     }
 );
+
+Route::group([
+    'prefix' => 'public',
+    'namespace' => 'App\Http\Controllers\Api\Public',
+    'middleware' => ['log.request']
+], function () {
+    Route::group(
+        [
+            'prefix' => 'product',
+        ],
+        function () {
+            Route::get('/', [
+                'uses' => 'ProductController@index'
+            ]);
+
+            Route::get('/{id}', [
+                'uses' => 'ProductController@show'
+            ])->where('id', '[1-9][0-9]*');
+        }
+    );
+});

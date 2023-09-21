@@ -18,6 +18,7 @@ Route::group(
     [
         'prefix' => 'backoffice',
         'namespace' => 'App\Http\Controllers\Api\Backoffice',
+        'middleware' => ['log.request']
     ],
     function () {
 

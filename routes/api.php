@@ -141,4 +141,19 @@ Route::group([
             ])->where('id', '[1-9][0-9]*');
         }
     );
+
+    Route::group(
+        [
+            'prefix' => 'order',
+        ],
+        function () {
+            Route::get('/', [
+                'uses' => 'OrderController@index'
+            ]);
+
+            Route::post('/', [
+                'uses' => 'OrderController@store'
+            ]);
+        }
+    );
 });

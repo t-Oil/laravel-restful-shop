@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Public;
 
 use App\Enums\OrderAddressType;
+use App\Events\OrderCreated;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Public\OrderResource;
 use App\Models\Order;
@@ -87,6 +88,8 @@ class OrderController extends Controller
 
             DB::commit();
 
+            event(new OrderCreated($createdOrder));
+
             return $this->successResponse(new OrderResource($createdOrder));
         } catch (\Throwable $e) {
             DB::rollback();
@@ -123,6 +126,7 @@ class OrderController extends Controller
             'shipping_address.required' => 'กรุณากรอกที่อยู่สำหรับจัดส่ง',
             'receipt_address.required' => 'กรุณากรอกที่อยู่สำหรับการออกใบเสร็จ',
             'products.required' => 'กรุณาเพิ่มสินค้า',
+            'products.array' => 'รูปแบบสินค้าผิดพลาด',
             'products.*.integer' => 'รหัสสินค้าต้องเป็นตัวเลขเท่านั้น',
         ];
 

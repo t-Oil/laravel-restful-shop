@@ -125,7 +125,7 @@ Route::group(
 Route::group([
     'prefix' => 'public',
     'namespace' => 'App\Http\Controllers\Api\Public',
-    'middleware' => ['log.request']
+    'middleware' => ['log.request'],
 ], function () {
     Route::group(
         [
@@ -149,15 +149,15 @@ Route::group([
         function () {
             Route::get('/', [
                 'uses' => 'OrderController@index'
-            ]);
+            ])->name('api.public.order.index');
 
             Route::get('/{order_number}', [
                 'uses' => 'OrderController@show'
-            ]);
+            ])->name('api.public.order.show');
 
             Route::post('/', [
                 'uses' => 'OrderController@store'
-            ]);
+            ])->name('api.public.order.store');
         }
     );
 });

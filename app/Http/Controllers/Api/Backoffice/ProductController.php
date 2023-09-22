@@ -32,6 +32,10 @@ class ProductController extends Controller
 
             $product = Product::with(['category'])->find($id);
 
+            if (!$product) {
+                return $this->errorResponse(404);
+            }
+
             return $this->successResponse(new ProductResource($product));
         } catch (\Throwable $e) {
             return $this->errorResponse(422, $e->getMessage());
@@ -56,7 +60,6 @@ class ProductController extends Controller
             if (empty($product)) {
                 return $this->errorResponse(404);
             }
-
 
             $product->update([
                 'name' => Arr::get($parameter, 'name'),

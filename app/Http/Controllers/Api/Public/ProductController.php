@@ -29,6 +29,10 @@ class ProductController extends Controller
 
             $product = Product::with(['category'])->where('is_active', 1)->find($id);
 
+            if (!$product) {
+                return $this->errorResponse(404);
+            }
+
             return $this->successResponse(new ProductResource($product));
         } catch (\Throwable $e) {
             return $this->errorResponse(422, $e->getMessage());

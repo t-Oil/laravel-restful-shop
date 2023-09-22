@@ -4,18 +4,41 @@ namespace App\Http\Controllers\Api\Public;
 
 use App\Enums\OrderAddressType;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Public\OrderResource;
 use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class OrderController extends Controller
 {
     public function index()
     {
-        return Order::with(['addresses', 'products'])->get();
+        try {
+            $order = Order::with(['addresses', 'products'])->get();
+
+            return $this->successResponse(OrderResource::collection($order));
+        } catch (\Throwable $e) {
+            return $this->errorResponse(422, $e->getMessage());
+        }
+    }
+
+    public function show($order_number)
+    {
+        try {
+            $order = Order::with(['addresses', 'products'])->where('order_number', $order_number)->first();
+
+            if (!$order) {
+                return $this->errorResponse(404);
+            }
+
+            return $this->successResponse(new OrderResource($order));
+        } catch (\Throwable $e) {
+            return $this->errorResponse(422, $e->getMessage());
+        }
     }
 
     public function store(Request $request)
@@ -51,9 +74,8 @@ class OrderController extends Controller
             }
 
             $products = Product::whereIn('id', Arr::get($parameter, 'products'))->where('is_active', 1)->get();
-
-
             $summary_price = 0;
+
             foreach ($products as $key => $product) {
                 $createdOrder->products()->attach($product->id, ['price' => $product->price]);
                 $summary_price += $product->price;
@@ -65,11 +87,16 @@ class OrderController extends Controller
 
             DB::commit();
 
-            return $createdOrder;
-        } catch (\Throwable $th) {
+            return $this->successResponse(new OrderResource($createdOrder));
+        } catch (\Throwable $e) {
             DB::rollback();
 
-            throw $th;
+            Log::error(get_class($this), [
+                'Line' => $e->getLine(),
+                'Message' => $e->getMessage(),
+            ]);
+
+            return $this->errorResponse(422, $e->getMessage());
         }
     }
 

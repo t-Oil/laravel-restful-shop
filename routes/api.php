@@ -151,6 +151,10 @@ Route::group([
                 'uses' => 'OrderController@index'
             ]);
 
+            Route::get('/{order_number}', [
+                'uses' => 'OrderController@show'
+            ]);
+
             Route::post('/', [
                 'uses' => 'OrderController@store'
             ]);

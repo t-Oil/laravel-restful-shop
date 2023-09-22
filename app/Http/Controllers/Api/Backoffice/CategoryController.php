@@ -31,6 +31,10 @@ class CategoryController extends Controller
         try {
             $category = Category::with(['products'])->find($id);
 
+            if (!$category) {
+                return $this->errorResponse(404);
+            }
+
             return $this->successResponse(new CategoryResource($category));
         } catch (\Throwable $e) {
             return $this->errorResponse(422, $e->getMessage());

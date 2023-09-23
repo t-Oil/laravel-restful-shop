@@ -21,7 +21,7 @@ class Controller extends BaseController
             'message' => 'OK',
         ];
 
-        if (!Arr::has($data->resource->toArray(), 'data')) {
+        if (!optional($data)->resource || !Arr::has($data->resource->toArray(), 'data')) {
             $response['data'] = $data;
         } else {
             $response['data'] = Arr::get($data->resource->toArray(), 'data') ?? $data->resource;
@@ -58,9 +58,9 @@ class Controller extends BaseController
         }
 
         return response()->json([
-            'status' => 400,
+            'status' => $status,
             'message' => $message,
             'error' => $errors,
-        ], 400);
+        ], $status);
     }
 }

@@ -37,9 +37,13 @@ Route::group(
                     ],
                     function () {
 
-                        Route::get('/user', function (Request $request) {
-                            return $request->user();
-                        });
+                        Route::post('/logout', [
+                            'uses' => 'AuthController@logout'
+                        ]);
+
+                        Route::get('/me', [
+                            'uses' => 'AuthController@me'
+                        ]);
                     }
                 );
             }
@@ -127,6 +131,21 @@ Route::group([
     'namespace' => 'App\Http\Controllers\Api\Public',
     'middleware' => ['log.request'],
 ], function () {
+    Route::group(
+        [
+            'prefix' => 'auth'
+        ],
+        function () {
+            Route::get('/login/{provider}', [
+                'uses' => 'AuthController@redirectToProvider'
+            ]);
+
+            Route::get('/login/{provider}/callback', [
+                'uses' => 'AuthController@handleProviderCallback'
+            ]);
+        }
+    );
+
     Route::group(
         [
             'prefix' => 'product',
